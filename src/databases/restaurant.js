@@ -9,7 +9,7 @@ const updateRestaurant = (restaurantId, restaurantData) => {
     } else {
       let updateFields = [];
       let queryParams = [];
-      
+
       if (restaurantData.image) {
         updateFields.push('image = ?');
         queryParams.push(restaurantData.image);
@@ -30,9 +30,11 @@ const updateRestaurant = (restaurantId, restaurantData) => {
       if (updateFields.length === 0) {
         resolve();
       } else {
-        const updateQuery = `UPDATE restaurant SET ${updateFields.join(', ')} WHERE id = ?`;
+        const updateQuery = `UPDATE restaurant SET ${updateFields.join(
+          ', ',
+        )} WHERE id = ?`;
         queryParams.push(restaurantId);
-        
+
         DB.query(updateQuery, queryParams)
           .then(() => resolve())
           .catch(error => reject(error));
@@ -48,7 +50,7 @@ const updateAddress = (restaurantId, addressData) => {
     } else {
       let updateFields = [];
       let queryParams = [];
-      
+
       if (addressData.street_name) {
         updateFields.push('street_name = ?');
         queryParams.push(addressData.street_name);
@@ -69,9 +71,11 @@ const updateAddress = (restaurantId, addressData) => {
       if (updateFields.length === 0) {
         resolve();
       } else {
-        const updateQuery = `UPDATE address SET ${updateFields.join(', ')} WHERE id_restaurant = ?`;
+        const updateQuery = `UPDATE address SET ${updateFields.join(
+          ', ',
+        )} WHERE id_restaurant = ?`;
         queryParams.push(restaurantId);
-        
+
         DB.query(updateQuery, queryParams)
           .then(() => resolve())
           .catch(error => reject(error));
@@ -87,10 +91,11 @@ const updateSchedule = (restaurantId, scheduleData) => {
     } else {
       try {
         for (const schedule of scheduleData) {
-          const { closingHourId, weekdayId, openingHourId } = await filterScheduleData(schedule);
+          const { closingHourId, weekdayId, openingHourId } =
+            await filterScheduleData(schedule);
           const updateFields = [];
           const queryParams = [];
-          
+
           if (weekdayId !== undefined) {
             updateFields.push('weekday_id = ?');
             queryParams.push(weekdayId);
@@ -103,12 +108,14 @@ const updateSchedule = (restaurantId, scheduleData) => {
             updateFields.push('closing_hour = ?');
             queryParams.push(closingHourId);
           }
-          
+
           if (updateFields.length === 0) {
             continue;
           }
-          
-          const updateQuery = `UPDATE restaurant_schedule SET ${updateFields.join(', ')} WHERE id = ? AND id_restaurant = ?`;
+
+          const updateQuery = `UPDATE restaurant_schedule SET ${updateFields.join(
+            ', ',
+          )} WHERE id = ? AND id_restaurant = ?`;
           queryParams.push(schedule.id, restaurantId);
 
           await DB.query(updateQuery, queryParams);
@@ -121,7 +128,6 @@ const updateSchedule = (restaurantId, scheduleData) => {
   });
 };
 
-
 const formatAddress = address => ({
   street_name: address.street_name,
   street_number: address.street_number,
@@ -129,21 +135,53 @@ const formatAddress = address => ({
   zip_code: address.zip_code,
 });
 
-const formatSchedule = schedule => ({
-  id: schedule.id,
-  id_restaurant: schedule.id_restaurant,
-  weekday: schedule.weekday_id,
-  opening_hour: schedule.opening_hour,
-  closing_hour: schedule.closing_hour,
-});
+const formatSchedule = schedule => {
+  return new Promise((resolve, reject) => {
+    DB.query('SELECT name FROM weekday WHERE id = ?', [schedule.weekday_id])
+      .then(([weekday]) => {
+        DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+          schedule.opening_hour,
+        ])
+          .then(([opening]) => {
+            DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+              schedule.closing_hour,
+            ])
+              .then(([closing]) => {
+                console.log(weekday);
+                const data = {
+                  id: schedule.id,
+                  id_restaurant: schedule.id_restaurant,
+                  weekday: weekday[0].name,
+                  opening_hour: opening[0].hour,
+                  closing_hour: closing[0].hour, 
+                };
+                resolve(data);
+              })
+              .catch(error => {
+                reject(error);
+              });
+          })
+          .catch(error => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
 
 const getRestaurantSchedule = restaurantId => {
   return new Promise((resolve, reject) => {
     DB.query('SELECT * FROM restaurant_schedule WHERE id_restaurant = ?', [
       restaurantId,
     ])
-      .then(([schedules]) => {
-        resolve(schedules.map(formatSchedule));
+      .then(async ([schedules]) => {
+        const data = await Promise.all(schedules.map(formatSchedule));
+
+
+        resolve(data);
       })
       .catch(error => {
         reject(error);
@@ -216,7 +254,7 @@ const deleteRestaurantById = restaurantId => {
     DB.query(
       `
       DELETE FROM promotion_schedule
-      WHERE id_product IN (
+      WHERE id_promotion IN (
         SELECT id FROM promotion WHERE id_product IN (
           SELECT id FROM product WHERE id_restaurant = ?
         )
@@ -313,7 +351,12 @@ const postRestaurant = (restaurantData, addressData, scheduleData) => {
   });
 };
 
-const editRestaurantById = (restaurantId, restaurantData, addressData, scheduleData) => {
+const editRestaurantById = (
+  restaurantId,
+  restaurantData,
+  addressData,
+  scheduleData,
+) => {
   return new Promise((resolve, reject) => {
     try {
       Promise.all([
@@ -328,7 +371,6 @@ const editRestaurantById = (restaurantId, restaurantData, addressData, scheduleD
     }
   });
 };
-
 
 module.exports = {
   getAllRestaurants,

@@ -48,9 +48,9 @@ const deleteProductById = productId => {
   });
 };
 
-const postNewPromotion = payload => {
+const getAllRestaurantProducts = restaurantId => {
   return new Promise((resolve, reject) => {
-    Product.postNewPromotion(payload)
+    Product.getAllRestaurantProducts(restaurantId)
       .then(data => {
         resolve(data);
       })
@@ -58,11 +58,11 @@ const postNewPromotion = payload => {
         reject(err);
       });
   });
-};
+}
 
-const getPromotionById = promotionId => {
+const getProductById = productId => {
   return new Promise((resolve, reject) => {
-    Product.getPromotionById(promotionId)
+    Product.getProductById(productId)
       .then(data => {
         resolve(data);
       })
@@ -70,39 +70,14 @@ const getPromotionById = promotionId => {
         reject(err);
       });
   });
-};
+}
 
-const deletePromotionById = promotionId => {
-  return new Promise((resolve, reject) => {
-    Product.deletePromotionById(promotionId)
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-};
-
-const editPromotionById = (payload) => {
-  return new Promise((resolve, reject) => {
-    Product.editPromotionById(payload)
-      .then(data => {
-        resolve(data);
-      })
-      .catch(err => {
-        reject(err);
-      });
-  });
-};
 
 module.exports = {
   getAllProducts,
   postNewProducts,
   editProductById,
   deleteProductById,
-  postNewPromotion,
-  getPromotionById,
-  deletePromotionById,
-  editPromotionById,
+  getAllRestaurantProducts,
+  getProductById
 };

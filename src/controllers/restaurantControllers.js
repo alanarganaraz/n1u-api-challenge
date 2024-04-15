@@ -5,7 +5,7 @@ const getAllRestaurants = (req, res) => {
     restaurantService
       .getAllRestaurants()
       .then(data => {
-        res.send({ status: 'oki', data });
+        res.send({ status: 'OK', data });
       })
       .catch(err => {
         res

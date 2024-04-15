@@ -82,15 +82,15 @@ const deleteProductById = (req, res) => {
   });
 };
 
-const getPromotionById = (req, res) => {
-  const { promotionId } = req.params;
-  if (!promotionId) {
+const getAllRestaurantProducts = (req, res) => {
+  const { restaurantId } = req.params;
+  if (!restaurantId) {
     const message = 'Params is required.';
     return res.status(400).send({ status: 'FAILED', data: { error: message } });
   }
   return new Promise(() => {
     productServices
-      .getPromotionById(promotionId)
+      .getAllRestaurantProducts(restaurantId)
       .then(data => {
         res.send({ status: 'OK', data });
       })
@@ -100,17 +100,17 @@ const getPromotionById = (req, res) => {
           .send({ status: 'FAILED', data: { error: err?.message || err } });
       });
   });
-};
+}
 
-const deletePromotionById = (req, res) => {
-  const { promotionId } = req.params;
-  if (!promotionId) {
+const getProductById = (req, res) => {
+  const { productId } = req.params;
+  if (!productId) {
     const message = 'Params is required.';
     return res.status(400).send({ status: 'FAILED', data: { error: message } });
   }
   return new Promise(() => {
     productServices
-      .deletePromotionById(promotionId)
+      .getProductById(productId)
       .then(data => {
         res.send({ status: 'OK', data });
       })
@@ -120,72 +120,14 @@ const deletePromotionById = (req, res) => {
           .send({ status: 'FAILED', data: { error: err?.message || err } });
       });
   });
-};
+}
 
-const editPromotionById = (req, res) => {
-  const { promotionId } = req.params;
-  const { promotionData, promotionScheduleData } = req.body;
-  if (!promotionId) {
-    const message = 'Params is required.';
-    return res.status(400).send({ status: 'FAILED', data: { error: message } });
-  }
-  return new Promise(() => {
-    const payload = {
-      promotionId,
-      promotionData,
-      promotionScheduleData,
-    };
-    productServices
-      .editPromotionById(payload)
-      .then(data => {
-        res.send({ status: 'OK', data });
-      })
-      .catch(err => {
-        res
-          .status(err?.status || 500)
-          .send({ status: 'FAILED', data: { error: err?.message || err } });
-      });
-  });
-};
-
-const postNewPromotion = (req, res) => {
-  const {
-    productId,
-    description,
-    promotionPrice,
-    weekdayPromotion,
-    openPromotionHour,
-    closePromotionHour,
-  } = req.body;
-  return new Promise(() => {
-    const payload = {
-      productId,
-      description,
-      promotionPrice,
-      weekdayPromotion,
-      openPromotionHour,
-      closePromotionHour,
-    };
-    productServices
-      .postNewPromotion(payload)
-      .then(data => {
-        res.send({ status: 'OK', data });
-      })
-      .catch(err => {
-        res
-          .status(err?.status || 500)
-          .send({ status: 'FAILED', data: { error: err?.message || err } });
-      });
-  });
-};
 
 module.exports = {
   getAllProducts,
   postNewProducts,
   editProductById,
   deleteProductById,
-  getPromotionById,
-  postNewPromotion,
-  deletePromotionById,
-  editPromotionById,
+  getAllRestaurantProducts,
+  getProductById
 };
