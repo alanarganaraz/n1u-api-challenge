@@ -4,11 +4,11 @@ const productController = require('../../controllers/productControllers');
 const router = express.Router();
 
 router
-  .get('/', productController.getAllProducts) // anda
-  .get('/restaurant/:restaurantId', productController.getAllRestaurantProducts) //anda
-  .get('/:productId', productController.getProductById) // anda
-  .post('/', productController.postNewProducts) // anda
-  .patch('/:productId', productController.editProductById) // anda
-  .delete('/:productId', productController.deleteProductById) // anda
+  .get('/', productController.getAllProducts) 
+  .get('/restaurant/:restaurantId', productController.getAllRestaurantProducts) 
+  .get('/:productId', productController.getProductById) 
+  .post('/', productController.postNewProducts) 
+  .patch('/:productId', productController.editProductById) 
+  .delete('/:productId', productController.deleteProductById) 
 
 module.exports = router;

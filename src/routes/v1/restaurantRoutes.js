@@ -4,10 +4,10 @@ const restaurantController = require('../../controllers/restaurantControllers');
 const router = express.Router();
 
 router
-  .get('/', restaurantController.getAllRestaurants) // anda
-  .get('/:restaurantId', restaurantController.getRestaurantById) // anda
-  .delete('/:restaurantId', restaurantController.deleteRestaurantById) // anda
-  .post('/', restaurantController.postRestaurant) // anda
-  .patch('/:restaurantId', restaurantController.editRestaurantById); // anda
+  .get('/', restaurantController.getAllRestaurants) 
+  .get('/:restaurantId', restaurantController.getRestaurantById) 
+  .delete('/:restaurantId', restaurantController.deleteRestaurantById) 
+  .post('/', restaurantController.postRestaurant) 
+  .patch('/:restaurantId', restaurantController.editRestaurantById); 
 
 module.exports = router;
