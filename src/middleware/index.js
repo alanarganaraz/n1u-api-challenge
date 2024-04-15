@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
 // el APIKEY deberia estar guardado como una secret en un servidor pero al no tenerlo, lo dejamos en este json
 // simulando que es la secret.
-const { apiKey } = require('../config/enviroment-dev.json')
+const { apiKey } = require('../config/enviroment-prod.json')
 
 const generateToken = () => {
   const payload = {
