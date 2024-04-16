@@ -251,56 +251,16 @@ const getRestaurantById = restaurantId => {
 
 const deleteRestaurantById = restaurantId => {
   return new Promise((resolve, reject) => {
-    DB.query(
-      `
-      DELETE FROM promotion_schedule
-      WHERE id_promotion IN (
-        SELECT id FROM promotion WHERE id_product IN (
-          SELECT id FROM product WHERE id_restaurant = ?
-        )
-      )
-    `,
-      [restaurantId],
-    )
+    DB.query(`DELETE FROM restaurant WHERE id = ?`, [restaurantId])
       .then(() => {
-        return DB.query(
-          `
-          DELETE FROM promotion
-          WHERE id_product IN (
-            SELECT id FROM product WHERE id_restaurant = ?
-          )
-        `,
-          [restaurantId],
-        );
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM product WHERE id_restaurant = ?`, [
-          restaurantId,
-        ]);
-      })
-      .then(() => {
-        return DB.query(
-          `DELETE FROM restaurant_schedule WHERE id_restaurant = ?`,
-          [restaurantId],
-        );
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM address WHERE id_restaurant = ?`, [
-          restaurantId,
-        ]);
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM restaurant WHERE id = ?`, [restaurantId]);
-      })
-      .then(() => {
-        resolve(true);
+        resolve(restaurantId);
       })
       .catch(error => {
-        console.log('🚀 ~ returnnewPromise ~ error:', error);
         reject(error);
       });
   });
 };
+
 
 const postRestaurant = (restaurantData, addressData, scheduleData) => {
   return new Promise((resolve, reject) => {
@@ -343,7 +303,7 @@ const postRestaurant = (restaurantData, addressData, scheduleData) => {
         return Promise.all(schedulePromises);
       })
       .then(() => {
-        resolve(true);
+        resolve(restaurantId);
       })
       .catch(error => {
         reject(error);
@@ -364,7 +324,7 @@ const editRestaurantById = (
         updateAddress(restaurantId, addressData),
         updateSchedule(restaurantId, scheduleData),
       ])
-        .then(() => resolve(true))
+        .then(() => resolve(restaurantId))
         .catch(error => reject(error));
     } catch (error) {
       reject(error);

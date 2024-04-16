@@ -29,7 +29,6 @@ const updatePromotion = (promotionId, promotionData) => {
         DB.query(updateQuery, queryParams)
           .then(() => resolve())
           .catch(error => reject(error));
-
       }
     }
   });
@@ -69,7 +68,7 @@ const formatSchedule = schedule => {
   });
 };
 
-const updatePromotionSchedule = (scheduleData) => {
+const updatePromotionSchedule = scheduleData => {
   return new Promise(async (resolve, reject) => {
     if (!scheduleData) {
       resolve();
@@ -122,17 +121,9 @@ const updatePromotionSchedule = (scheduleData) => {
 
 const deletePromotionById = promotionId => {
   return new Promise((resolve, reject) => {
-    DB.query('DELETE FROM promotion_schedule WHERE id_promotion = ?', [
-      promotionId,
-    ])
-      .then(([]) => {
-        DB.query('DELETE FROM promotion WHERE id = ?', [promotionId])
-          .then(() => {
-            resolve(true);
-          })
-          .catch(err => {
-            reject(err);
-          });
+    DB.query('DELETE FROM promotion WHERE id = ?', [promotionId])
+      .then(() => {
+        resolve(promotionId);
       })
       .catch(err => {
         reject(err);
@@ -149,25 +140,29 @@ const getPromotionById = promotionId => {
         ])
           .then(async ([promotionSchedule]) => {
             let data;
-            await Promise.all(promotion.map(async result => {
-              const scheduleData = await Promise.all(promotionSchedule.map(async promotionSchedule => {
-                const schedule = {
-                  weekday_id: promotionSchedule.weekday_promotion,
-                  opening_hour: promotionSchedule.opening_promotion_hour,
-                  closing_hour: promotionSchedule.closing_promotion_hour,
+            await Promise.all(
+              promotion.map(async result => {
+                const scheduleData = await Promise.all(
+                  promotionSchedule.map(async promotionSchedule => {
+                    const schedule = {
+                      weekday_id: promotionSchedule.weekday_promotion,
+                      opening_hour: promotionSchedule.opening_promotion_hour,
+                      closing_hour: promotionSchedule.closing_promotion_hour,
+                    };
+                    return formatSchedule(schedule);
+                  }),
+                );
+
+                data = {
+                  promotionId: result.id,
+                  description: result.description,
+                  promotionPrice: result.promotion_price,
+                  weekdayPromotion: scheduleData[0].weekday,
+                  openingPromotion: scheduleData[0].opening_hour,
+                  closingPromotion: scheduleData[0].closing_hour,
                 };
-                return formatSchedule(schedule);
-              }));
-              
-              data = {
-                promotionId: result.id,
-                description: result.description,
-                promotionPrice: result.promotionPrice,
-                weekdayPromotion: scheduleData[0],
-                openingPromotion: scheduleData[0],
-                closingPromotionHour: scheduleData[0],
-              };
-            }));
+              }),
+            );
 
             resolve(data);
           })
@@ -180,7 +175,6 @@ const getPromotionById = promotionId => {
       });
   });
 };
-
 
 const postNewPromotion = ({
   productId,
@@ -216,7 +210,7 @@ const postNewPromotion = ({
           ],
         )
           .then(() => {
-            resolve(true);
+            resolve(promotionId);
           })
           .catch(err => {
             reject(err);
@@ -239,7 +233,7 @@ const editPromotionById = ({
         updatePromotion(promotionId, promotionData),
         updatePromotionSchedule(promotionScheduleData),
       ])
-        .then(() => resolve(true))
+        .then(() => resolve(promotionId))
         .catch(error => reject(error));
     } catch (error) {
       reject(error);

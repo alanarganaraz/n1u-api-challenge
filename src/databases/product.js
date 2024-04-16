@@ -86,7 +86,7 @@ const postNewProducts = ({ restaurantId, categoryId, productData }) => {
         productData.price,
       ],
     )
-      .then(([]) => resolve(true))
+      .then(([]) => resolve(productId))
       .catch(err => {
         reject(err);
       });
@@ -97,7 +97,7 @@ const editProductById = ({ productId, categoryId, productData }) => {
   return new Promise((resolve, reject) => {
     try {
       Promise.all([updateProduct(productId, categoryId, productData)])
-        .then(() => resolve(true))
+        .then(() => resolve(productId))
         .catch(error => reject(error));
     } catch (error) {
       reject(error);
@@ -108,7 +108,7 @@ const editProductById = ({ productId, categoryId, productData }) => {
 const deleteProductById = productId => {
   return new Promise((resolve, reject) => {
     DB.query('DELETE FROM product WHERE id = ?', [productId])
-      .then(([]) => resolve(true))
+      .then(([]) => resolve(productId))
       .catch(err => {
         reject(err);
       });
