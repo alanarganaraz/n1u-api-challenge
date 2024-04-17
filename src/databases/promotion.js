@@ -7,22 +7,67 @@ const updatePromotion = (promotionId, promotionData) => {
     if (!promotionData) {
       resolve();
     } else {
-      DB.query(
-        'UPDATE promotion SET description = ?, promotion_price = ? WHERE id = ?',
-        [
-          promotionData.description,
-          promotionData.promotion_price,
-          promotionId,
-        ]
-      )
-        .then(() => resolve())
-        .catch(error => reject(error));
+      let updateFields = [];
+      let queryParams = [];
+
+      if (promotionData.description) {
+        updateFields.push('description = ?');
+        queryParams.push(promotionData.description);
+      }
+      if (promotionData.promotion_price) {
+        updateFields.push('promotion_price = ?');
+        queryParams.push(promotionData.promotion_price);
+      }
+      if (updateFields.lenght === 0) {
+        resolve();
+      } else {
+        const updateQuery = `UPDATE promotion SET ${updateFields.join(
+          ', ',
+        )} WHERE id = ?`;
+        queryParams.push(promotionId);
+
+        DB.query(updateQuery, queryParams)
+          .then(() => resolve())
+          .catch(error => reject(error));
+      }
     }
   });
 };
 
+const formatSchedule = schedule => {
+  return new Promise((resolve, reject) => {
+    DB.query('SELECT name FROM weekday WHERE id = ?', [schedule.weekday_id])
+      .then(([weekday]) => {
+        DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+          schedule.opening_hour,
+        ])
+          .then(([opening]) => {
+            DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+              schedule.closing_hour,
+            ])
+              .then(([closing]) => {
+                const data = {
+                  weekday: weekday[0].name,
+                  opening_hour: opening[0].hour,
+                  closing_hour: closing[0].hour,
+                };
+                resolve(data);
+              })
+              .catch(error => {
+                reject(error);
+              });
+          })
+          .catch(error => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
 
-const updatePromotionSchedule = (promotionId, scheduleData) => {
+const updatePromotionSchedule = (scheduleData, promotionId) => {
   return new Promise(async (resolve, reject) => {
     if (!scheduleData) {
       resolve();
@@ -34,10 +79,11 @@ const updatePromotionSchedule = (promotionId, scheduleData) => {
             opening_hour: schedule.opening_promotion_hour,
             closing_hour: schedule.closing_promotion_hour,
           };
-          const { closingHourId, weekdayId, openingHourId } = await filterScheduleData(scheduleData);
+          const { closingHourId, weekdayId, openingHourId } =
+            await filterScheduleData(scheduleData);
           const updateFields = [];
           const queryParams = [];
-          
+
           if (weekdayId !== undefined) {
             updateFields.push('weekday_promotion = ?');
             queryParams.push(weekdayId);
@@ -50,14 +96,16 @@ const updatePromotionSchedule = (promotionId, scheduleData) => {
             updateFields.push('closing_promotion_hour = ?');
             queryParams.push(closingHourId);
           }
-          
+
           if (updateFields.length === 0) {
             return;
           }
-          
-          const updateQuery = `UPDATE promotion_schedule SET ${updateFields.join(', ')} WHERE id = ?`;
-          queryParams.push(schedule.id, promotionId);
 
+          const updateQuery = `UPDATE promotion_schedule SET ${updateFields.join(
+            ', ',
+          )} WHERE id = ?`;
+
+          queryParams.push(promotionId);
           return DB.query(updateQuery, queryParams);
         });
 
@@ -70,60 +118,11 @@ const updatePromotionSchedule = (promotionId, scheduleData) => {
   });
 };
 
-
-const updateProduct = (productId, categoryId, productData) => {
-  return new Promise((resolve, reject) => {
-    if (!productData) {
-      resolve();
-    } else {
-      let updateFields = [];
-      let queryParams = [];
-      
-      if (categoryId) {
-        updateFields.push('id_category = ?');
-        queryParams.push(categoryId);
-      }
-      if (productData.image) {
-        updateFields.push('image = ?');
-        queryParams.push(productData.image);
-      }
-      if (productData.name) {
-        updateFields.push('name = ?');
-        queryParams.push(productData.name);
-      }
-      if (productData.price) {
-        updateFields.push('price = ?');
-        queryParams.push(productData.price);
-      }
-
-      if (updateFields.length === 0) {
-        resolve();
-      } else {
-        const updateQuery = `UPDATE product SET ${updateFields.join(', ')} WHERE id = ?`;
-        queryParams.push(productId);
-        console.log("🚀 ~ returnnewPromise ~ updateQuery:", updateQuery)
-        
-        DB.query(updateQuery, queryParams)
-          .then(() => resolve())
-          .catch(error => reject(error));
-      }
-    }
-  });
-};
-
 const deletePromotionById = promotionId => {
   return new Promise((resolve, reject) => {
-    DB.query('DELETE FROM promotion_schedule WHERE id_promotion = ?', [
-      promotionId,
-    ])
-      .then(([]) => {
-        DB.query('DELETE FROM promotion WHERE id = ?', [promotionId])
-          .then(() => {
-            resolve(true);
-          })
-          .catch(err => {
-            reject(err);
-          });
+    DB.query('DELETE FROM promotion WHERE id = ?', [promotionId])
+      .then(() => {
+        resolve(promotionId);
       })
       .catch(err => {
         reject(err);
@@ -137,25 +136,38 @@ const getPromotionById = promotionId => {
       .then(([promotion]) => {
         DB.query('SELECT * from promotion_schedule WHERE id_promotion = ?', [
           promotionId,
-        ]).then(([promotionSchedule]) => {
-          let data;
-          promotion.map(result => {
-            promotionSchedule.map(promotionSchedule => {
-              data = {
-                promotionId: result.id,
-                description: result.description,
-                promotionPrice: result.promotionPrice,
-                weekdayPromotion: promotionSchedule.weekday_promotion,
-                openingPromotion: promotionSchedule.opening_promotion_hour,
-                closing_promotion_hour:
-                  promotionSchedule.closing_promotion_hour,
-              };
-            });
-          });
-          resolve(data).catch(err => {
+        ])
+          .then(async ([promotionSchedule]) => {
+            let data;
+            await Promise.all(
+              promotion.map(async result => {
+                const scheduleData = await Promise.all(
+                  promotionSchedule.map(async promotionSchedule => {
+                    const schedule = {
+                      weekday_id: promotionSchedule.weekday_promotion,
+                      opening_hour: promotionSchedule.opening_promotion_hour,
+                      closing_hour: promotionSchedule.closing_promotion_hour,
+                    };
+                    return formatSchedule(schedule);
+                  }),
+                );
+
+                data = {
+                  promotionId: result.id,
+                  description: result.description,
+                  promotionPrice: result.promotion_price,
+                  weekdayPromotion: scheduleData[0].weekday,
+                  openingPromotion: scheduleData[0].opening_hour,
+                  closingPromotion: scheduleData[0].closing_hour,
+                };
+              }),
+            );
+
+            resolve(data);
+          })
+          .catch(err => {
             reject(err);
           });
-        });
       })
       .catch(err => {
         reject(err);
@@ -197,7 +209,7 @@ const postNewPromotion = ({
           ],
         )
           .then(() => {
-            resolve(true);
+            resolve(promotionId);
           })
           .catch(err => {
             reject(err);
@@ -209,14 +221,18 @@ const postNewPromotion = ({
   });
 };
 
-const editPromotionById = ({ promotionId, promotionData, promotionScheduleData }) => {
+const editPromotionById = ({
+  promotionId,
+  promotionData,
+  promotionScheduleData,
+}) => {
   return new Promise((resolve, reject) => {
     try {
       Promise.all([
         updatePromotion(promotionId, promotionData),
-        updatePromotionSchedule(promotionId, promotionScheduleData),
+        updatePromotionSchedule(promotionScheduleData, promotionId),
       ])
-        .then(() => resolve(true))
+        .then(() => resolve(promotionId))
         .catch(error => reject(error));
     } catch (error) {
       reject(error);

@@ -1,8 +1,8 @@
 const Restaurant = require('../databases/restaurant');
 
-const getAllRestaurants = () => {
+const getAllRestaurants = (offset, limit) => {
   return new Promise((resolve, reject) => {
-    Restaurant.getAllRestaurants()
+    Restaurant.getAllRestaurants(offset, limit)
       .then(data => {
         resolve(data);
       })

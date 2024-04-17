@@ -9,7 +9,7 @@ const updateRestaurant = (restaurantId, restaurantData) => {
     } else {
       let updateFields = [];
       let queryParams = [];
-      
+
       if (restaurantData.image) {
         updateFields.push('image = ?');
         queryParams.push(restaurantData.image);
@@ -30,9 +30,11 @@ const updateRestaurant = (restaurantId, restaurantData) => {
       if (updateFields.length === 0) {
         resolve();
       } else {
-        const updateQuery = `UPDATE restaurant SET ${updateFields.join(', ')} WHERE id = ?`;
+        const updateQuery = `UPDATE restaurant SET ${updateFields.join(
+          ', ',
+        )} WHERE id = ?`;
         queryParams.push(restaurantId);
-        
+
         DB.query(updateQuery, queryParams)
           .then(() => resolve())
           .catch(error => reject(error));
@@ -48,7 +50,7 @@ const updateAddress = (restaurantId, addressData) => {
     } else {
       let updateFields = [];
       let queryParams = [];
-      
+
       if (addressData.street_name) {
         updateFields.push('street_name = ?');
         queryParams.push(addressData.street_name);
@@ -69,9 +71,11 @@ const updateAddress = (restaurantId, addressData) => {
       if (updateFields.length === 0) {
         resolve();
       } else {
-        const updateQuery = `UPDATE address SET ${updateFields.join(', ')} WHERE id_restaurant = ?`;
+        const updateQuery = `UPDATE address SET ${updateFields.join(
+          ', ',
+        )} WHERE id_restaurant = ?`;
         queryParams.push(restaurantId);
-        
+
         DB.query(updateQuery, queryParams)
           .then(() => resolve())
           .catch(error => reject(error));
@@ -87,10 +91,11 @@ const updateSchedule = (restaurantId, scheduleData) => {
     } else {
       try {
         for (const schedule of scheduleData) {
-          const { closingHourId, weekdayId, openingHourId } = await filterScheduleData(schedule);
+          const { closingHourId, weekdayId, openingHourId } =
+            await filterScheduleData(schedule);
           const updateFields = [];
           const queryParams = [];
-          
+
           if (weekdayId !== undefined) {
             updateFields.push('weekday_id = ?');
             queryParams.push(weekdayId);
@@ -103,12 +108,14 @@ const updateSchedule = (restaurantId, scheduleData) => {
             updateFields.push('closing_hour = ?');
             queryParams.push(closingHourId);
           }
-          
+
           if (updateFields.length === 0) {
             continue;
           }
-          
-          const updateQuery = `UPDATE restaurant_schedule SET ${updateFields.join(', ')} WHERE id = ? AND id_restaurant = ?`;
+
+          const updateQuery = `UPDATE restaurant_schedule SET ${updateFields.join(
+            ', ',
+          )} WHERE id = ? AND id_restaurant = ?`;
           queryParams.push(schedule.id, restaurantId);
 
           await DB.query(updateQuery, queryParams);
@@ -121,7 +128,6 @@ const updateSchedule = (restaurantId, scheduleData) => {
   });
 };
 
-
 const formatAddress = address => ({
   street_name: address.street_name,
   street_number: address.street_number,
@@ -129,21 +135,52 @@ const formatAddress = address => ({
   zip_code: address.zip_code,
 });
 
-const formatSchedule = schedule => ({
-  id: schedule.id,
-  id_restaurant: schedule.id_restaurant,
-  weekday: schedule.weekday_id,
-  opening_hour: schedule.opening_hour,
-  closing_hour: schedule.closing_hour,
-});
+const formatSchedule = schedule => {
+  return new Promise((resolve, reject) => {
+    DB.query('SELECT name FROM weekday WHERE id = ?', [schedule.weekday_id])
+      .then(([weekday]) => {
+        DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+          schedule.opening_hour,
+        ])
+          .then(([opening]) => {
+            DB.query('SELECT hour FROM hour_of_day WHERE id = ?', [
+              schedule.closing_hour,
+            ])
+              .then(([closing]) => {
+                const data = {
+                  id: schedule.id,
+                  id_restaurant: schedule.id_restaurant,
+                  weekday: weekday[0].name,
+                  opening_hour: opening[0].hour,
+                  closing_hour: closing[0].hour, 
+                };
+                resolve(data);
+              })
+              .catch(error => {
+                reject(error);
+              });
+          })
+          .catch(error => {
+            reject(error);
+          });
+      })
+      .catch(error => {
+        reject(error);
+      });
+  });
+};
+
 
 const getRestaurantSchedule = restaurantId => {
   return new Promise((resolve, reject) => {
     DB.query('SELECT * FROM restaurant_schedule WHERE id_restaurant = ?', [
       restaurantId,
     ])
-      .then(([schedules]) => {
-        resolve(schedules.map(formatSchedule));
+      .then(async ([schedules]) => {
+        const data = await Promise.all(schedules.map(formatSchedule));
+
+
+        resolve(data);
       })
       .catch(error => {
         reject(error);
@@ -191,9 +228,9 @@ const getAddressByRestaurantId = restaurantId => {
   });
 };
 
-const getAllRestaurants = () => {
+const getAllRestaurants = (offset = 0, limit = 10) => {
   return new Promise((resolve, reject) => {
-    DB.query('SELECT * FROM restaurant')
+    DB.query('SELECT * FROM restaurant LIMIT ?, ?', [parseInt(offset), parseInt(limit)])
       .then(([results]) => resolve(getRestaurantData(results)))
       .catch(err => {
         reject(err);
@@ -213,56 +250,16 @@ const getRestaurantById = restaurantId => {
 
 const deleteRestaurantById = restaurantId => {
   return new Promise((resolve, reject) => {
-    DB.query(
-      `
-      DELETE FROM promotion_schedule
-      WHERE id_product IN (
-        SELECT id FROM promotion WHERE id_product IN (
-          SELECT id FROM product WHERE id_restaurant = ?
-        )
-      )
-    `,
-      [restaurantId],
-    )
+    DB.query(`DELETE FROM restaurant WHERE id = ?`, [restaurantId])
       .then(() => {
-        return DB.query(
-          `
-          DELETE FROM promotion
-          WHERE id_product IN (
-            SELECT id FROM product WHERE id_restaurant = ?
-          )
-        `,
-          [restaurantId],
-        );
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM product WHERE id_restaurant = ?`, [
-          restaurantId,
-        ]);
-      })
-      .then(() => {
-        return DB.query(
-          `DELETE FROM restaurant_schedule WHERE id_restaurant = ?`,
-          [restaurantId],
-        );
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM address WHERE id_restaurant = ?`, [
-          restaurantId,
-        ]);
-      })
-      .then(() => {
-        return DB.query(`DELETE FROM restaurant WHERE id = ?`, [restaurantId]);
-      })
-      .then(() => {
-        resolve(true);
+        resolve(restaurantId);
       })
       .catch(error => {
-        console.log('🚀 ~ returnnewPromise ~ error:', error);
         reject(error);
       });
   });
 };
+
 
 const postRestaurant = (restaurantData, addressData, scheduleData) => {
   return new Promise((resolve, reject) => {
@@ -305,7 +302,7 @@ const postRestaurant = (restaurantData, addressData, scheduleData) => {
         return Promise.all(schedulePromises);
       })
       .then(() => {
-        resolve(true);
+        resolve(restaurantId);
       })
       .catch(error => {
         reject(error);
@@ -313,7 +310,12 @@ const postRestaurant = (restaurantData, addressData, scheduleData) => {
   });
 };
 
-const editRestaurantById = (restaurantId, restaurantData, addressData, scheduleData) => {
+const editRestaurantById = (
+  restaurantId,
+  restaurantData,
+  addressData,
+  scheduleData,
+) => {
   return new Promise((resolve, reject) => {
     try {
       Promise.all([
@@ -321,14 +323,13 @@ const editRestaurantById = (restaurantId, restaurantData, addressData, scheduleD
         updateAddress(restaurantId, addressData),
         updateSchedule(restaurantId, scheduleData),
       ])
-        .then(() => resolve(true))
+        .then(() => resolve(restaurantId))
         .catch(error => reject(error));
     } catch (error) {
       reject(error);
     }
   });
 };
-
 
 module.exports = {
   getAllRestaurants,

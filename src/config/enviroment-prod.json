@@ -1,3 +1,7 @@
 {
-    "apiKey": "6BpN2WvR8LjA3X7c9QsP5T1mY"
+    "apiKey": "6BpN2WvR8LjA3X7c9QsP5T1mY",
+    "DB_HOST": "localhost",
+    "DB_USER": "alanroot2",
+    "DB_PASSWORD": "123",
+    "DB_NAME": "n1u_challenge"
 }
