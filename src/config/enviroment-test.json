@@ -1,3 +1,7 @@
 {
-    "apiKey": "1234test"
+    "apiKey": "1234test",
+    "DB_HOST": "localhost",
+    "DB_USER": "alanroot2",
+    "DB_PASSWORD": "123",
+    "DB_NAME": "n1u_challenge_test"
 }

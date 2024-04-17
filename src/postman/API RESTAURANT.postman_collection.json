@@ -1,0 +1,511 @@
+{
+	"info": {
+		"_postman_id": "f75d4742-d087-4b47-9064-ed288e3dd2fb",
+		"name": "API RESTAURANT",
+		"description": "Documentacion de API RESTAURANTE  \nChallenge N1U BACKEND",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "19074634"
+	},
+	"item": [
+		{
+			"name": "restaurants",
+			"item": [
+				{
+					"name": "createNewRestaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "{{api-key}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n\n  \"restaurantData\": {\n    \"name\": \"Restaurante 1 ejemplo\",\n    \"image\": \"restaurante1.jpg\",\n    \"number\": \"1120084655\",\n    \"rating\": 2\n    },\n  \"addressData\": {\n    \"street_name\": \"paraguay\",\n    \"street_number\": \"500\",\n    \"province\": \"Buenos Aires\",\n    \"zip_code\": \"1704\"\n    },\n  \"scheduleData\": [\n    {\n    \"weekday\": \"Lunes\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Martes\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Miércoles\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Jueves\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Viernes\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Sábado\",\n    \"opening_hour\": \"09:00\",\n    \"closing_hour\": \"19:00\"\n    },\n    {\n    \"weekday\": \"Domingo\",\n    \"opening_hour\": \"Cerrado\",\n    \"closing_hour\": \"Cerrado\"\n    }\n  ]\n}\n",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/restaurants",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"restaurants"
+							]
+						},
+						"description": "Request para crear un nuevo restaurante, con su BODY de ejemplo."
+					},
+					"response": []
+				},
+				{
+					"name": "getAllRestaurants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/restaurants",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"restaurants"
+							]
+						},
+						"description": "En esta request, estaremos obteniendo todos los restaurantes de la BD, podemos utilizar filtros para paginado como el LIMIT y OFFSET, ejemplo de REQUEST:\n\n{{baseUrl}}/api/v1/restaurants?limit=1&offset=2"
+					},
+					"response": []
+				},
+				{
+					"name": "getRestaurantById",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/restaurants/60f3305a-e122-43f1-9711-0074a3d05946",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"restaurants",
+								"60f3305a-e122-43f1-9711-0074a3d05946"
+							]
+						},
+						"description": "En esta request, estaremos obteniendo unicamente los datos del restaurante mediante el ID."
+					},
+					"response": []
+				},
+				{
+					"name": "deleteRestaurantById",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/restaurants/1",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"restaurants",
+								"1"
+							]
+						},
+						"description": "Con esta request, eliminaremos un restaurante por ID, incluyendo sus direcciones, horarios de funcionamiento, productos relacionados a ese restaurante y sus promociones relacionados a esos productos."
+					},
+					"response": []
+				},
+				{
+					"name": "editRestaurant",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"restaurantData\": {\n        \"name\": \"NOMBRE EDITADO\",\n        \"price\": 1\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/restaurants/60f3305a-e122-43f1-9711-0074a3d05946",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"restaurants",
+								"60f3305a-e122-43f1-9711-0074a3d05946"
+							]
+						},
+						"description": "En esta request, se editara cualquier dato de un restaurante pasandole por params el ID del restaurante, y por body, lo que queramos editar."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "products",
+			"item": [
+				{
+					"name": "createNewProduct",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"restaurantId\": \"60f3305a-e122-43f1-9711-0074a3d05946\",\n    \"categoryId\": 3,\n    \"productData\": {\n        \"image\": \"productImage.jpg\",\n        \"name\": \"productName\",\n        \"price\": 2000\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						},
+						"description": "En esta request simplemente se crea un producto con un body valido, necesitamos si o si un ID de restaurante."
+					},
+					"response": []
+				},
+				{
+					"name": "editProduct",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"categoryId\": 1,\n    \"productData\": {\n        \"name\": \"PRODUCT EDITED\"\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/a8f1d520-40a9-43b5-8eb8-b37b9765505a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"a8f1d520-40a9-43b5-8eb8-b37b9765505a"
+							]
+						},
+						"description": "Aca se edita un producto pasandole por query el ID, y usando un body valido como en el ejemplo."
+					},
+					"response": []
+				},
+				{
+					"name": "deleteProduct",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/a8f1d520-40a9-43b5-8eb8-b37b9765505a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"a8f1d520-40a9-43b5-8eb8-b37b9765505a"
+							]
+						},
+						"description": "Se elimina el producto mediante el ID pasado por QUERY, y se eliminan todos sus promociones relacionadas."
+					},
+					"response": []
+				},
+				{
+					"name": "getAllProducts",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products"
+							]
+						},
+						"description": "Utilizando esta request, estamos obteniendo todos los productos, podemos poner un filtro OFFSET y LIMIT"
+					},
+					"response": []
+				},
+				{
+					"name": "getProductByRestaurantId",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/restaurant/60f3305a-e122-43f1-9711-0074a3d05946",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"restaurant",
+								"60f3305a-e122-43f1-9711-0074a3d05946"
+							]
+						},
+						"description": "Aqui obtenemos todos los productos del restaurante que pasamos por ID, podemos tambien usar un filtro LIMIT y OFFSET"
+					},
+					"response": []
+				},
+				{
+					"name": "getProductById",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/products/a8f1d520-40a9-43b5-8eb8-b37b9765505a",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"products",
+								"a8f1d520-40a9-43b5-8eb8-b37b9765505a"
+							]
+						},
+						"description": "Aqui obtenemos un producto por ID"
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "promotions",
+			"item": [
+				{
+					"name": "createNewPromotion",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"productId\": \"9da3d164-c9f2-4ffa-ae56-76f5f71d32b5\",\n    \"description\": \"Promo en ASDAS\",\n    \"promotionPrice\": 200.20,\n    \"weekdayPromotion\": \"Martes\",\n    \"openPromotionHour\": \"09:00\",\n    \"closePromotionHour\": \"14:00\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/promotions",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"promotions"
+							]
+						},
+						"description": "En esta request simplemente se crea una promocion con un body valido, necesitamos si o si un ID de restaurante."
+					},
+					"response": []
+				},
+				{
+					"name": "editPromotion",
+					"request": {
+						"method": "PATCH",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"promotionData\": {\n        \"description\": \"PROMO EDITADO\"\n    },\n    \"promotionScheduleData\": [{\n        \"weekday_promotion\": \"Miercoles\",\n        \"closing_promotion_hour\": \"12:00\"\n    }]\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "http://localhost:3000/api/v1/promotions/fa9ef7e9-8892-4266-b057-4aaa154ebe49",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"promotions",
+								"fa9ef7e9-8892-4266-b057-4aaa154ebe49"
+							]
+						},
+						"description": "Aca se edita una promocion pasandole por query el ID, y usando un body valido como en el ejemplo."
+					},
+					"response": []
+				},
+				{
+					"name": "deletePromotion",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/promotions/42c92a6a-c643-47d3-87e6-b9a8322c98e3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"promotions",
+								"42c92a6a-c643-47d3-87e6-b9a8322c98e3"
+							]
+						},
+						"description": "Se elimina una promocion mediante el ID pasado por QUERY, y se eliminan todas sus fechas de promocion relacionadas."
+					},
+					"response": []
+				},
+				{
+					"name": "getPromotionById",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "api-key",
+								"value": "1234",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "http://localhost:3000/api/v1/promotions/42c92a6a-c643-47d3-87e6-b9a8322c98e3",
+							"protocol": "http",
+							"host": [
+								"localhost"
+							],
+							"port": "3000",
+							"path": [
+								"api",
+								"v1",
+								"promotions",
+								"42c92a6a-c643-47d3-87e6-b9a8322c98e3"
+							]
+						},
+						"description": "Aqui obtenemos una promocion por ID"
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
