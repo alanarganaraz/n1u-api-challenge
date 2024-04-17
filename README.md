@@ -24,7 +24,7 @@ git pull origin HEAD
 
 Con todos los modulos instalados, la versión de node correcta, ya podremos usar la API.
 
-Para inizializar la aplicación:
+Para inicializar la aplicación:
 
 ```python
 # Para correr la aplicación
@@ -38,7 +38,7 @@ npm test
 
 Actualmente esta BD se esta conectando con la config dentro de los enviroments.
 
-ACLARACION: para poder correrlo local se va a tener que poner el HOST correspondiente a su maquina, con su USER y PASSWORD.
+ACLARACIÓN: para poder correrlo local se va a tener que poner el HOST correspondiente a su maquina, con su USER y PASSWORD.
 
 
 El archivo SQL contiene todas las tablas con sus relaciones listas.
@@ -48,7 +48,7 @@ El archivo SQL contiene todas las tablas con sus relaciones listas.
 Debemos ingresar a la carpeta POSTMAN dentro del archivo src, e importarlo dentro del Postman.
 Ahi podremos ver todas las requests con su documentacion, y un body valido para ejecutar la consulta, siempre y cuando este el API corriendo y tengamos la BD conectada.
 
-ACLARACION: Esta la API protegida con APIKEY's, a continuacion dejo las claves para la correcta ejecucion de las requests.
+ACLARACIÓN: Esta la API protegida con APIKEY's, a continuacion dejo las claves para la correcta ejecucion de las requests.
 
 APIKEY DEV: 1234
 APIKEY TEST: 1234test
