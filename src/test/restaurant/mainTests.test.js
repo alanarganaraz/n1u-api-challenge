@@ -58,6 +58,65 @@ describe('GET api/v1/restaurants', () => {
   });
 });
 
+describe('GET BY LIMIT AND OFFSERT api/v1/restaurants?limit&offset', () => {
+  beforeEach(async () => {
+    const sql =
+      'INSERT INTO restaurant (id, image, name, number, rating) VALUES (?, ?, ?, ?, ?)';
+    const values = ['1', 'jpg.jpg', 'hola', '123', 4];
+    const sql2 =
+      'INSERT INTO restaurant (id, image, name, number, rating) VALUES (?, ?, ?, ?, ?)';
+    const values2 = ['2', 'jpg.jpg', 'hola', '123', 4];
+    const sql3 =
+      'INSERT INTO restaurant (id, image, name, number, rating) VALUES (?, ?, ?, ?, ?)';
+    const values3 = ['3', 'jpg.jpg', 'hola', '123', 4];
+    try {
+      await db.query(sql, values);
+      await db.query(sql2, values2);
+      await db.query(sql3, values3);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  afterEach(async () => {
+    const sql = 'DELETE FROM restaurant WHERE id = ?';
+    const values = ['1'];
+    const sql2 = 'DELETE FROM restaurant WHERE id = ?';
+    const values2 = ['2'];
+    const sql3 = 'DELETE FROM restaurant WHERE id = ?';
+    const values3 = ['3'];
+    try {
+      await db.query(sql, values);
+      await db.query(sql2, values2);
+      await db.query(sql3, values3);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('GET /api/v1/restaurants?limit&offset - should return 200 with restaurant ID 1', async () => {
+    const res = await request(app)
+      .get('/api/v1/restaurants?limit=3&offset=1')
+      .set('api-key', '1234');
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('OK');
+
+    const restaurant = res.body.data;
+    expect(restaurant[0]).toHaveProperty('id', '2');
+    expect(restaurant[0]).toHaveProperty('image', 'jpg.jpg');
+    expect(restaurant[0]).toHaveProperty('name', 'hola');
+    expect(restaurant[0]).toHaveProperty('number', '123');
+    expect(restaurant[0]).toHaveProperty('rating', 4);
+
+    expect(restaurant[1]).toHaveProperty('id', '3');
+    expect(restaurant[1]).toHaveProperty('image', 'jpg.jpg');
+    expect(restaurant[1]).toHaveProperty('name', 'hola');
+    expect(restaurant[1]).toHaveProperty('number', '123');
+    expect(restaurant[1]).toHaveProperty('rating', 4);
+  });
+});
+
 describe('POST api/v1/restaurants', () => {
   it('ERROR /api/v1/restaurants - should return 403 without api-key', async () => {
     const res = await request(app).get('/api/v1/restaurants');
@@ -323,6 +382,101 @@ describe('GET api/v1/product', () => {
     expect(product[1]).toHaveProperty('id_category', '3');
     expect(product[1]).toHaveProperty('image', '123.jpg');
     expect(product[1]).toHaveProperty('name', 'hola producto 2');
+  });
+});
+
+describe('GET BY LIMIT AND OFFSET api/v1/products?limit&offset', () => {
+  beforeEach(async () => {
+    const sql =
+      'INSERT INTO restaurant (id, image, name, number, rating) VALUES (?, ?, ?, ?, ?)';
+    const values = ['1', 'jpg.jpg', 'hola', '123', 4];
+    const sqlProduct =
+      'INSERT INTO product (id, id_restaurant, id_category, image, name, price) VALUES (?, ?, ?, ?, ?, ?)';
+    const valuesProduct = ['1', '1', 3, '123.jpg', 'hola producto', 4];
+    const sqlProduct2 =
+      'INSERT INTO product (id, id_restaurant, id_category, image, name, price) VALUES (?, ?, ?, ?, ?, ?)';
+    const valuesProduct2 = ['2', '1', 3, '123.jpg', 'hola producto 2', 5];
+    try {
+      await db.query(sql, values);
+      await db.query(sqlProduct, valuesProduct);
+      await db.query(sqlProduct2, valuesProduct2);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  afterEach(async () => {
+    const sql = 'DELETE FROM restaurant WHERE id = ?';
+    const values = ['1'];
+    try {
+      await db.query(sql, values);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('GET /api/v1/products?limit&offset - should return 200 with products limit and offset', async () => {
+    const res = await request(app)
+      .get('/api/v1/products?limit=1&offset=1')
+      .set('api-key', '1234');
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('OK');
+
+    const product = res.body.data[0];
+
+    expect(product).toHaveProperty('id_restaurant', '1');
+    expect(product).toHaveProperty('id_category', '3');
+    expect(product).toHaveProperty('image', '123.jpg');
+    expect(product).toHaveProperty('name', 'hola producto 2');
+  });
+});
+
+describe('GET BY LIMIT AND OFFSET api/v1/products/restaurant/:id?limit&offset', () => {
+  beforeEach(async () => {
+    const sql =
+      'INSERT INTO restaurant (id, image, name, number, rating) VALUES (?, ?, ?, ?, ?)';
+    const values = ['1', 'jpg.jpg', 'hola', '123', 4];
+    const sqlProduct =
+      'INSERT INTO product (id, id_restaurant, id_category, image, name, price) VALUES (?, ?, ?, ?, ?, ?)';
+    const valuesProduct = ['1', '1', 3, '123.jpg', 'hola producto', 4];
+    const sqlProduct2 =
+      'INSERT INTO product (id, id_restaurant, id_category, image, name, price) VALUES (?, ?, ?, ?, ?, ?)';
+    const valuesProduct2 = ['2', '1', 3, '123.jpg', 'hola producto 2', 5];
+    
+    try {
+      await db.query(sql, values);
+      await db.query(sqlProduct, valuesProduct);
+      await db.query(sqlProduct2, valuesProduct2);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  afterEach(async () => {
+    const sql = 'DELETE FROM restaurant WHERE id = ?';
+    const values = ['1'];
+    try {
+      await db.query(sql, values);
+    } catch (error) {
+      throw error;
+    }
+  });
+
+  it('GET /api/v1/products/restaurant/:id?limit&offset - should return 200 with products limit and offset', async () => {
+    const res = await request(app)
+      .get('/api/v1/products/restaurant/1?limit=1&offset=0')
+      .set('api-key', '1234');
+
+    expect(res.statusCode).toEqual(200);
+    expect(res.body.status).toEqual('OK');
+
+    const product = res.body.data[0];
+
+    expect(product).toHaveProperty('id_restaurant', '1');
+    expect(product).toHaveProperty('id_category', '3');
+    expect(product).toHaveProperty('image', '123.jpg');
+    expect(product).toHaveProperty('name', 'hola producto');
   });
 });
 

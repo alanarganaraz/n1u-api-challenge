@@ -1,9 +1,10 @@
 const productServices = require('../services/productServices');
 
 const getAllProducts = (req, res) => {
+  const { offset, limit } = req.query;
   return new Promise(() => {
     productServices
-      .getAllProducts()
+      .getAllProducts(offset, limit)
       .then(data => {
         res.send({ status: 'OK', data });
       })
@@ -84,13 +85,14 @@ const deleteProductById = (req, res) => {
 
 const getAllRestaurantProducts = (req, res) => {
   const { restaurantId } = req.params;
+  const { offset, limit } = req.query;
   if (!restaurantId) {
     const message = 'Params is required.';
     return res.status(400).send({ status: 'FAILED', data: { error: message } });
   }
   return new Promise(() => {
     productServices
-      .getAllRestaurantProducts(restaurantId)
+      .getAllRestaurantProducts(restaurantId, offset, limit)
       .then(data => {
         res.send({ status: 'OK', data });
       })

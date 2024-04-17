@@ -46,7 +46,6 @@ const formatSchedule = schedule => {
               schedule.closing_hour,
             ])
               .then(([closing]) => {
-                console.log(weekday);
                 const data = {
                   weekday: weekday[0].name,
                   opening_hour: opening[0].hour,
@@ -68,7 +67,7 @@ const formatSchedule = schedule => {
   });
 };
 
-const updatePromotionSchedule = scheduleData => {
+const updatePromotionSchedule = (scheduleData, promotionId) => {
   return new Promise(async (resolve, reject) => {
     if (!scheduleData) {
       resolve();
@@ -105,8 +104,8 @@ const updatePromotionSchedule = scheduleData => {
           const updateQuery = `UPDATE promotion_schedule SET ${updateFields.join(
             ', ',
           )} WHERE id = ?`;
-          queryParams.push(schedule.id);
 
+          queryParams.push(promotionId);
           return DB.query(updateQuery, queryParams);
         });
 
@@ -231,7 +230,7 @@ const editPromotionById = ({
     try {
       Promise.all([
         updatePromotion(promotionId, promotionData),
-        updatePromotionSchedule(promotionScheduleData),
+        updatePromotionSchedule(promotionScheduleData, promotionId),
       ])
         .then(() => resolve(promotionId))
         .catch(error => reject(error));

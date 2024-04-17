@@ -147,7 +147,6 @@ const formatSchedule = schedule => {
               schedule.closing_hour,
             ])
               .then(([closing]) => {
-                console.log(weekday);
                 const data = {
                   id: schedule.id,
                   id_restaurant: schedule.id_restaurant,
@@ -229,9 +228,9 @@ const getAddressByRestaurantId = restaurantId => {
   });
 };
 
-const getAllRestaurants = () => {
+const getAllRestaurants = (offset = 0, limit = 10) => {
   return new Promise((resolve, reject) => {
-    DB.query('SELECT * FROM restaurant')
+    DB.query('SELECT * FROM restaurant LIMIT ?, ?', [parseInt(offset), parseInt(limit)])
       .then(([results]) => resolve(getRestaurantData(results)))
       .catch(err => {
         reject(err);

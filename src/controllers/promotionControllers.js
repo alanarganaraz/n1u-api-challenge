@@ -10,7 +10,6 @@ const getPromotionById = (req, res) => {
     promotionServices
       .getPromotionById(promotionId)
       .then(data => {
-        console.log("🚀 ~ returnnewPromise ~ data:", data)
         res.send({ status: 'OK', data });
       })
       .catch(err => {

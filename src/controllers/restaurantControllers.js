@@ -1,9 +1,10 @@
 const restaurantService = require('../services/restaurantServices');
 
 const getAllRestaurants = (req, res) => {
+  const { offset, limit } = req.query
   return new Promise(() => {
     restaurantService
-      .getAllRestaurants()
+      .getAllRestaurants(offset, limit)
       .then(data => {
         res.send({ status: 'OK', data });
       })

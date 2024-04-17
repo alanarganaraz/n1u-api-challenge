@@ -1,8 +1,8 @@
 const Product = require('../databases/product');
 
-const getAllProducts = () => {
+const getAllProducts = (offset, limit) => {
   return new Promise((resolve, reject) => {
-    Product.getAllProducts()
+    Product.getAllProducts(offset, limit)
       .then(data => {
         resolve(data);
       })
@@ -48,9 +48,9 @@ const deleteProductById = productId => {
   });
 };
 
-const getAllRestaurantProducts = restaurantId => {
+const getAllRestaurantProducts = (restaurantId, offset, limit,) => {
   return new Promise((resolve, reject) => {
-    Product.getAllRestaurantProducts(restaurantId)
+    Product.getAllRestaurantProducts(restaurantId, offset, limit)
       .then(data => {
         resolve(data);
       })

@@ -42,7 +42,7 @@ const updateProduct = (productId, categoryId, productData) => {
   });
 };
 
-const getAllProducts = () => {
+const getAllProducts = (offset = 0, limit = 10) => {
   return new Promise((resolve, reject) => {
     DB.query(
       `
@@ -64,7 +64,10 @@ const getAllProducts = () => {
         hour_of_day AS opening_hour ON promotion_schedule.opening_promotion_hour = opening_hour.id
       LEFT JOIN 
         hour_of_day AS closing_hour ON promotion_schedule.closing_promotion_hour = closing_hour.id
-    `)
+      LIMIT ?, ?
+    `,
+      [parseInt(offset), parseInt(limit)]
+    )
       .then(([results]) => resolve(results))
       .catch(err => {
         reject(err);
@@ -115,7 +118,7 @@ const deleteProductById = productId => {
   });
 };
 
-const getAllRestaurantProducts = restaurantId => {
+const getAllRestaurantProducts = (restaurantId, offset = 0, limit = 10) => {
   return new Promise((resolve, reject) => {
     DB.query(
       `
@@ -124,7 +127,7 @@ const getAllRestaurantProducts = restaurantId => {
         promotion.id AS promotion_id,
         promotion.description AS promotion_description,
         promotion.promotion_price,
-        promotion_schedule.weekday_promotion,
+        weekday_name.name AS weekday_promotion_name,
         opening_hour.hour AS opening_promotion_hour,
         closing_hour.hour AS closing_promotion_hour
       FROM 
@@ -137,17 +140,24 @@ const getAllRestaurantProducts = restaurantId => {
         hour_of_day AS opening_hour ON promotion_schedule.opening_promotion_hour = opening_hour.id
       LEFT JOIN 
         hour_of_day AS closing_hour ON promotion_schedule.closing_promotion_hour = closing_hour.id
+      LEFT JOIN 
+        weekday AS weekday_name ON promotion_schedule.weekday_promotion = weekday_name.id
       WHERE 
         product.id_restaurant = ?
+      LIMIT ?, ?
     `,
-      [restaurantId],
+      [restaurantId, parseInt(offset), parseInt(limit)],
     )
-      .then(([products]) => resolve(products))
+    
+      .then(([products]) => {
+        return resolve(products)
+      })
       .catch(err => {
         reject(err);
       });
   });
 };
+
 
 const getProductById = productId => {
   return new Promise((resolve, reject) => {
