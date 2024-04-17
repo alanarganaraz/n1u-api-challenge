@@ -36,7 +36,10 @@ npm test
 
 ### Instrucciones para la BD
 
-Actualmente esta BD se esta conectando con la config dentro de los enviroments, para poder correrlo local se va a tener que poner el HOST correspondiente a su maquina, con su USER y PASSWORD.
+Actualmente esta BD se esta conectando con la config dentro de los enviroments.
+
+ACLARACION: para poder correrlo local se va a tener que poner el HOST correspondiente a su maquina, con su USER y PASSWORD.
+
 
 El archivo SQL contiene todas las tablas con sus relaciones listas.
 
@@ -44,6 +47,22 @@ El archivo SQL contiene todas las tablas con sus relaciones listas.
 
 Debemos ingresar a la carpeta POSTMAN dentro del archivo src, e importarlo dentro del Postman.
 Ahi podremos ver todas las requests con su documentacion, y un body valido para ejecutar la consulta, siempre y cuando este el API corriendo y tengamos la BD conectada.
+
+ACLARACION: Esta la API protegida con APIKEY's, a continuacion dejo las claves para la correcta ejecucion de las requests.
+
+APIKEY DEV: 1234
+APIKEY TEST: 1234test
+APIKEY PROD: 6BpN2WvR8LjA3X7c9QsP5T1mYs
+
+en HEADERS, hay que pasarle: api-key, y en los valores, los que se propocionaron arriba.
+
+EJEMPLO CON CURL:
+
+```
+curl --location 'http://localhost:3000/api/v1/restaurants?limit=1&offset=1' \
+--header 'api-key: 1234'
+```
+
 
 ```
 Enlace a la documentacion de los endpoints.
