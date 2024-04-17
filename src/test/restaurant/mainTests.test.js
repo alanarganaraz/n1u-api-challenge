@@ -2,6 +2,7 @@
 const request = require('supertest');
 const app = require('../../index');
 const db = require('../../databases/database');
+const { apiKey } = require('../../config/enviroment-dev.json')
 
 describe('GET api/v1/restaurants', () => {
   beforeEach(async () => {
@@ -42,7 +43,7 @@ describe('GET api/v1/restaurants', () => {
   it('GET /api/v1/restaurants - should return 200 with restaurant ID 1', async () => {
     const res = await request(app)
       .get('/api/v1/restaurants/1')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -97,7 +98,7 @@ describe('GET BY LIMIT AND OFFSERT api/v1/restaurants?limit&offset', () => {
   it('GET /api/v1/restaurants?limit&offset - should return 200 with restaurant ID 1', async () => {
     const res = await request(app)
       .get('/api/v1/restaurants?limit=3&offset=1')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -159,7 +160,7 @@ describe('POST api/v1/restaurants', () => {
     const resPost = await request(app)
       .post('/api/v1/restaurants/')
       .send({ restaurantData, addressData, scheduleData })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     lastRestaurant = resPost.body.data;
 
@@ -169,7 +170,7 @@ describe('POST api/v1/restaurants', () => {
 
     const resGet = await request(app)
       .get(`/api/v1/restaurants/${lastRestaurant}`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -225,14 +226,14 @@ describe('PATCH api/v1/restaurants', () => {
     const resPatch = await request(app)
       .patch(`/api/v1/restaurants/160`)
       .send({ restaurantData })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resPatch.statusCode).toEqual(200);
     expect(resPatch.body.data).toEqual('160');
 
     const resGet = await request(app)
       .get(`/api/v1/restaurants/160`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -283,7 +284,7 @@ describe('DELETE api/v1/restaurants', () => {
   it('DELETE /api/v1/restaurants/:id - should delete the restaurant from lastRestaurant', async () => {
     const resDelete = await request(app)
       .delete(`/api/v1/restaurants/190`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resDelete.statusCode).toEqual(200);
     expect(resDelete.body.data).toEqual('190');
@@ -346,7 +347,7 @@ describe('GET api/v1/product', () => {
   it('GET /api/v1/products - should return 200 with product ID 1', async () => {
     const res = await request(app)
       .get('/api/v1/products/1')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -363,7 +364,7 @@ describe('GET api/v1/product', () => {
   it('GET /api/v1/products/restaurant/:idRestaurant - should return 200 with all restaurant products', async () => {
     const res = await request(app)
       .get('/api/v1/products/restaurant/2')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -418,7 +419,7 @@ describe('GET BY LIMIT AND OFFSET api/v1/products?limit&offset', () => {
   it('GET /api/v1/products?limit&offset - should return 200 with products limit and offset', async () => {
     const res = await request(app)
       .get('/api/v1/products?limit=1&offset=1')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -466,7 +467,7 @@ describe('GET BY LIMIT AND OFFSET api/v1/products/restaurant/:id?limit&offset', 
   it('GET /api/v1/products/restaurant/:id?limit&offset - should return 200 with products limit and offset', async () => {
     const res = await request(app)
       .get('/api/v1/products/restaurant/1?limit=1&offset=0')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -516,7 +517,7 @@ describe('POST api/v1/products', () => {
     const resPost = await request(app)
       .post('/api/v1/products/')
       .send({ productData, restaurantId: '2', categoryId: 3 })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     lastProduct = resPost.body.data;
 
@@ -526,7 +527,7 @@ describe('POST api/v1/products', () => {
 
     const resGet = await request(app)
       .get(`/api/v1/products/${lastProduct}`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -586,14 +587,14 @@ describe('PATCH api/v1/products', () => {
     const resPatch = await request(app)
       .patch(`/api/v1/products/1`)
       .send({ categoryId: 4, productData })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resPatch.statusCode).toEqual(200);
     expect(resPatch.body.data).toEqual('1');
 
     const resGet = await request(app)
       .get(`/api/v1/products/1`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -644,7 +645,7 @@ describe('DELETE api/v1/products', () => {
   it('DELETE /api/v1/products/:id - should delete the product from lastRestaurant', async () => {
     const resDelete = await request(app)
       .delete(`/api/v1/products/1`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resDelete.statusCode).toEqual(200);
     expect(resDelete.body.data).toEqual('1');
@@ -718,7 +719,7 @@ describe('GET api/v1/promotions', () => {
   it('GET /api/v1/promotions - should return 200 with promotion ID 50', async () => {
     const res = await request(app)
       .get('/api/v1/promotions/50')
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(res.statusCode).toEqual(200);
     expect(res.body.status).toEqual('OK');
@@ -773,7 +774,7 @@ describe('POST api/v1/promotions', () => {
         openPromotionHour: '01:00',
         closePromotionHour: '02:00',
       })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     lastPromotion = resPost.body.data;
 
@@ -783,7 +784,7 @@ describe('POST api/v1/promotions', () => {
 
     const resGet = await request(app)
       .get(`/api/v1/promotions/${lastPromotion}`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -861,14 +862,14 @@ describe('PATCH api/v1/promotions', () => {
     const resPatch = await request(app)
       .patch(`/api/v1/promotions/50`)
       .send({ categoryId: 4, promotionData })
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resPatch.statusCode).toEqual(200);
     expect(resPatch.body.data).toEqual('50');
 
     const resGet = await request(app)
       .get(`/api/v1/promotions/50`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resGet.statusCode).toEqual(200);
     expect(resGet.body.status).toEqual('OK');
@@ -935,7 +936,7 @@ describe('DELETE api/v1/promotions', () => {
   it('DELETE /api/v1/promotions/:id - should delete the promotion from lastRestaurant', async () => {
     const resDelete = await request(app)
       .delete(`/api/v1/promotions/50`)
-      .set('api-key', '1234');
+      .set('api-key', apiKey);
 
     expect(resDelete.statusCode).toEqual(200);
     expect(resDelete.body.data).toEqual('50');
